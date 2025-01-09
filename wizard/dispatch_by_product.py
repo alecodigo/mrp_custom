@@ -15,18 +15,23 @@ class DispatchByProduct(models.TransientModel):
     location_dest_id = fields.Many2one('stock.location', string='Destination Location', required=True)
 
     def action_transfer_by_product(self):
+        # import ipdb; ipdb.set_trace()
+        stock_picking = self.env['stock.picking']
         self.ensure_one()
-        stock_move_obj = self.env['stock.move']
-        for record in self:
-            stock_move = stock_move_obj.create({
-                'name': record.product_id.name,
-                'product_id': record.product_id.id,
-                'product_uom_qty': record.quantity,
-                'product_uom': record.product_id.uom_id.id,
-                'location_id': record.location_id.id,
-                'location_dest_id': record.location_dest_id.id,
+        for wizard in self:
+            picking = stock_picking.create({
+                'partner_id': self.env.user.partner_id.id,
+                'picking_type_id': self.env.ref('stock.picking_type_internal').id,  # Tipo de picking
+                'location_id': wizard.location_id.id,
+                'location_dest_id': wizard.location_dest_id.id,
+                'move_ids_without_package': [(0, 0, {
+                    'name': wizard.product_id.name,
+                    'product_id': wizard.product_id.id,
+                    'product_uom_qty': wizard.quantity,
+                    'product_uom': wizard.product_id.uom_id.id,
+                    'location_id': wizard.location_id.id,
+                    'location_dest_id': wizard.location_dest_id.id,
+                })]
             })
-            stock_move._action_confirm()
-            stock_move._action_assign()
-            stock_move._action_done()
+            picking.button_validate()
         return True
