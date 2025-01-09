@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="view_repair_form_inherit" model="ir.ui.view">
+            <field name="name">repair.order.form.inherit</field>
+            <field name="model">repair.order</field>
+            <field name="inherit_id" ref="repair.view_repair_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header[1]" position="replace">
+                    <header>
+                        <button name="action_send_mail" states="draft" string="Enviar Presupuesto" type="object"/>
+                        <button name="print_repair_order" states="draft" string="Imprimir Presupuesto" type="object"/>
+                        <button name="%(action_report_reparaciones)d" states="confirmed" string="Imprimir boleta" type="action"/>
+                        <button name="%(action_report_reparaciones_ticket)d" states="confirmed" string="Imprimir ticket (Condiciones)" type="action"/>
+                        <button name="%(action_report_reparaciones_ticket_qr)d" states="confirmed" string="Imprimir ticket (QR)" type="action"/>
+                        <button class="oe_highlight" name="action_validate" states="draft" string="Confirmar Reparación" type="object"/>
+                        <button attrs="{'invisible': ['&amp;', ('state','!=','confirmed'), '!', '&amp;', ('state','=','ready'), ('invoice_method','=','b4repair')]}" class="oe_highlight" name="action_repair_start" string="Iniciar Reparación" type="object"/>
+                        <button name="action_repair_cancel_draft" states="cancel" string="Enviar a Borrador" type="object"/>
+                        <button class="oe_highlight" name="action_repair_end" states="under_repair,esperando_repuesto" string="Finalizar reparación" type="object"/>
+                        <button attrs="{'invisible': [('state','not in',('under_repair','garantia'))]}" name="esperando_repuesto" string="Esperando repuesto" type="object"/>
+                        <button class="oe_highlight" groups="account.group_account_invoice" name="action_repair_invoice_create" states="2binvoiced" string="Crear factura" type="object"/>
+                        <button class="oe_highlight" name="action_entregado" states="done,garantia" string="Entregado" type="object"/>
+                        <button attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}" name="action_repair_cancel" string="Cancelar Reparación" type="object"/>
+                        <button name="action_repair_cancel" states="draft" string="Cancelar Reparación" type="object"/>
+                        <field name="state" statusbar_visible="draft,confirmed,done,entregado" widget="statusbar"/>
+                    </header>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="replace">
+                    <field name="name" readonly="1"/>
+                </xpath>
+
+                <xpath expr="//group[1]" position="replace"/>
+
+                <xpath expr="//notebook[1]" position="before">
+                    <group>
+                        <group>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="partner_id" required="1"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="modelo"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="marca"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="imei"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="invoice_method"/>
+                        </group>
+                        <group>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="fecha"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="guarantee_limit" string="Garantia vence"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="serial"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="otros_contactos"/>
+                            <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="taller"/>
+                        </group>
+                    </group>
+                    <group>
+                            <field attrs="{'invisible': ['|',('guarantee_limit','=',False),('state','not in',('entregado','garantia'))]}" name="ingreso_garantia"/>
+                            <field attrs="{'invisible': [('ingreso_garantia','!=',True)],'required': [('ingreso_garantia', '=', True)]}" name="fecha_ingreso_garantia"/>
+                            <field invisible="1" name="location_id"/>
+                            <field domain="[('type', 'in', ['product', 'consu'])]" invisible="1" name="product_id" required="0"/>
+                            <field groups="uom.group_uom" invisible="1" name="product_uom"/>
+                            <field invisible="1" name="product_qty"/>
+                            <field invisible="1" name="pricelist_id"/>
+                            <field name="tracking" invisible="1" attrs="{'readonly': 1}"/>
+                            <field name="invoice_state" invisible="1"/>
+                            <field name="product_uom_category_id" invisible="1"/>
+                            <field name="lot_id" context="{'default_product_id': product_id}" groups="stock.group_production_lot" attrs="{'required':[('tracking', 'in', ['serial', 'lot'])], 'invisible': [('tracking', 'not in', ['serial', 'lot'])], 'readonly': [('state', '=', 'done')]}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="address_id" groups="sale.group_delivery_invoice_address" invisible="1"/>
+                            <field name="user_id" domain="[('share', '=', False)]" invisible="1"/>
+                            <field name="partner_invoice_id" attrs="{'invisible':[('invoice_method','=', 'none')],'required':[('invoice_method','!=','none')]}" groups="sale.group_delivery_invoice_address"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" invisible="1"/>
+                            <field name="company_id" invisible="1" options="{'no_create': True}"/>
+                    </group>
+                </xpath>
+                <!--xpath expr="//notebook[1]" position="replace"/-->
+                <xpath expr="//notebook[1]" position="replace">
+                    <notebook>
+                        <page string="Daño reportado">
+                            <group>
+                                <field attrs="{'readonly': [('state','in',('done','entregado','garantia'))]}" name="danno" colspan="2" nolabel="1" placeholder="Daño reportado en el equipo..."/>
+                            </group>
+                        </page>
+                        <page string="Extras">
+                            <group col="4" colspan="2">
+                                <group colspan="2">
+                                    <separator string="Accesorios"/>
+                                    <field name="bateria"/>
+                                    <field name="cargador"/>
+                                    <separator string="Desbloqueo"/>
+                                    <field name="codigo_desbloqueo"/>
+                                </group>
+                                <group colspan="2">
+                                    <table border="0" style="width: 180px;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <separator string="Patron"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <p>Ingrese la secuencia del patron de desbloqueo manualmente o presionando los botones.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" colspan="3">
+                                                    <field name="patron" nolabel="1"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a class="boton_patron" id="boton1" name="boton1" onclick="actualizar(1)">1</a>
+                                                </td>
+                                                <td>
+                                                    <a class="boton_patron" id="boton2" name="boton2" onclick="actualizar(2)">2</a>
+                                                </td>
+                                                <td>
+                                                    <a class="boton_patron" id="boton3" name="boton3" onclick="actualizar(3)">3</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a class="boton_patron" id="boton4" name="boton4" onclick="actualizar(4)">4</a>
+                                                </td>
+                                                <td>
+                                                    <a class="boton_patron" id="boton5" name="boton5" onclick="actualizar(5)">5</a>
+                                                </td>
+                                                <td>
+                                                    <a class="boton_patron" id="boton6" name="boton6" onclick="actualizar(6)">6</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a class="boton_patron" id="boton7" name="boton7" onclick="actualizar(7)">7</a>
+                                                </td>
+                                                <td>
+                                                    <a class="boton_patron" id="boton8" name="boton8" onclick="actualizar(8)">8</a>
+                                                </td>
+                                                <td>
+                                                    <a class="boton_patron" id="boton9" name="boton9" onclick="actualizar(9)">9</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Diagnostico">
+                            <group>
+                                <field name="diagnostico" nolabel="1" colspan="2" placeholder="Diagnostico del equipo..."/>
+                            </group>
+                        </page>
+                        <page string="Observaciones">
+                            <group>
+                                <field name="observaciones" nolabel="1" colspan="2" placeholder="Observaciones del equipo..."/>
+                            </group>
+                        </page>
+                        <page string="Servicios a Facturar">
+                            <h5/>
+                            <h5>Nota: Los productos o servicios agregados en este segmento pasaran a la factura una vez se confirme.</h5>
+                            <group>
+                                <field name="fees_lines" nolabel="1" colspan="2">
+                                    <form string="Fees">
+                                        <group>
+                                            <field name="company_id" invisible="1" force_save="1"/>
+                                            <field name="product_id" required="True"/>
+                                            <field name="name"/>
+                                            <field name="product_uom_category_id" invisible="1"/>
+                                            <label for="product_uom_qty"/>
+                                            <div class="o_row">
+                                                <field name="product_uom_qty" string="Quantity"/>
+                                                <field name="product_uom" groups="uom.group_uom"/>
+                                            </div>
+                                            <field name="price_unit"/>
+                                            <field widget="many2many_tags" name="tax_id"/>
+                                            <field name="price_subtotal" widget="monetary" invisible="1"/>
+                                            <field name="currency_id" invisible="1"/>
+                                        </group>
+                                    </form>
+                                    <tree string="Fees" editable="bottom">
+                                        <field name="company_id" invisible="1" force_save="1"/>
+                                        <field name="product_id" required="True"/>
+                                        <field name='name' optional="show"/>
+                                        <field name="product_uom_qty" string="Quantity"/>
+                                        <field name="product_uom_category_id" invisible="1"/>
+                                        <field name="product_uom" string="Unit of Measure" groups="uom.group_uom" optional="show"/>
+                                        <field name="price_unit"/>
+                                        <field name="tax_id" widget="many2many_tags" optional="show"/>
+                                        <field name="price_subtotal" widget="monetary"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Abonos">
+                            <group>
+                                <field name="abonos_ids" nolabel="1" colspan="2">
+                                    <tree editable="top">
+                                        <field name="fecha"/>
+                                        <field name="monto" sum="Total"/>
+                                        <field name="saldo" sum="Total"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_repair_tree_inherit" model="ir.ui.view">
+            <field name="name">repair.order.tree.inherit</field>
+            <field name="model">repair.order</field>
+            <field name="inherit_id" ref="repair.view_repair_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree[1]" position="replace">
+                    <tree decoration-info="state=='draft'" decoration-muted="state in ('entregado','cancel')" string="Repairs order">
+                        <field name="fecha"/>
+                        <field name="name" string="Referencia"/>
+                        <field name="partner_id"/>
+                        <field name="cedula_cliente"/>
+                        <field name="marca"/>
+                        <field name="modelo"/>
+                        <field name="serial"/>
+                        <field name="imei"/>
+                        <field invisible="1" name="company_id"/>
+                        <field name="guarantee_limit"/>
+                        <field name="amount_total"/>
+                        <field name="state" widget="badge" decoration-info="state == 'draft'"
+                                                           decoration-muted="state == 'cancel'"
+                                                           decoration-primary="state in ['confirmed','under_repair','ready']"
+                                                           decoration-warning="state in ['invoice_except','2binvoiced','esperando_repuesto']"
+                                                           decoration-success="state in ['done','entregado']" 
+                                                           decoration-danger="state == 'garantia'" 
+                                                           />
+                    </tree>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_repair_search_inherit" model="ir.ui.view">
+            <field name="name">repair.order.search.inherit</field>
+            <field name="model">repair.order</field>
+            <field name="inherit_id" ref="repair.view_repair_order_form_filter"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <!-- Permite la busqueda por los siguientes campos -->
+                    <field name="fecha"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="cedula_cliente"/>
+                    <field name="marca"/>
+                    <field name="modelo"/>
+                    <field name="serial"/>
+                    <field name="imei"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

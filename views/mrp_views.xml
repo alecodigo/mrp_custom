@@ -1,0 +1,17 @@
+<odoo>
+    <record id="mrp_production_form_view" model="ir.ui.view">
+        <field name="name">mrp.production.inherit.view.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_scrap']" position="after">
+                <button 
+                name="action_dispach_by_product" 
+                type="object" 
+                string="Despachar Subproductos"
+                invisible="state in ('cancel', 'draft')"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dispatch_by_product_wizard_form" model="ir.ui.view">
+        <field name="name">dispatch.by.product.wizard.form</field>
+        <field name="model">dispatch.by.product</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Transfer Wizard">
+                <group>
+                    <field name="product_id"/>
+                    <field name="quantity"/>
+                    <field name="location_id"/>
+                    <field name="location_dest_id"/>
+                </group>
+                <footer>
+                    <button string="Transfer" type="object" name="action_transfer_by_product" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

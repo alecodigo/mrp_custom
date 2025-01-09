@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="change_workcenter_wizard_form_view" model="ir.ui.view">
+        <field name="name">change.workcenter.form</field>
+        <field name="model">change.workcenter</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="alert alert-warning" role="alert">
+                    <span>Uno o más Centros de Trabajo estan ocupados, por favor actualicelos.</span>
+                </div>
+                <sheet>
+                    <group>
+                        <field name="individual" colspan="2"/>
+                    </group>
+                    <group>
+                        <field name="workcenter_id" invisible="individual == True" required="individual != True"/>
+                        <field name="mrp_production_id" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="change_workcenter_line_ids" invisible="individual != True" colspan="2" nolabel="1">
+                            <tree create="false" edit="true" delete="false" editable="bottom" decoration-danger="working_state != 'normal'">
+                                <field name="workorder_id" column_invisible="1"/>
+                                <field name="working_state" column_invisible="1"/>
+                                <field name="name" readonly="1" force_save="1"/>
+                                <field name="workcenter_id" domain="[('working_state','=','normal')]" required="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button
+                        string="Confirmar"
+                        name="update_change"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    <button string="Cerrar" class="btn btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="change_workcenter_action" model="ir.actions.act_window">
+        <field name="name">Selección de Centro de Trabajo</field>
+        <field name="res_model">change.workcenter</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

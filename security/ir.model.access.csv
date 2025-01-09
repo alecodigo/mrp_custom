@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_change_workcenter,access_change_workcenter,model_change_workcenter,base.group_user,1,1,1,1
+access_change_workcenter_line,access_change_workcenter_line,model_change_workcenter_line,base.group_user,1,1,1,1
+access_dispatch_by_product,dispatch_by_product,model_dispatch_by_product,base.group_user,1,1,1,1
