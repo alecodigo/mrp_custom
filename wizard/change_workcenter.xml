@@ -39,7 +39,6 @@
             </form>
         </field>
     </record>
-
     <record id="change_workcenter_action" model="ir.actions.act_window">
         <field name="name">Selección de Centro de Trabajo</field>
         <field name="res_model">change.workcenter</field>

@@ -4,13 +4,44 @@
         <field name="model">mrp.production</field>
         <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_title">
+                    <h3><field name="process_name" readonly="1" force_save="1"/></h3>
+                    <field name="process_id" invisible="1"/>
+                </div>
+            </xpath>
             <xpath expr="//button[@name='button_scrap']" position="after">
-                <button 
-                name="action_dispach_by_product" 
-                type="object" 
-                string="Despachar Subproductos"
-                invisible="state in ('cancel', 'draft')"
-                />
+                <button name="action_dispach_by_product"
+                    type="object" string="Despachar subproducto" 
+                    context="{'default_location_id': location_dest_id, 'default_mrp_id': id}" 
+                    invisible="state in ('cancel', 'draft', 'confirmed', 'to_close', 'process')" />
+                <button name="action_send_to_other_locations" 
+                    type="object" string="Unir lotes" 
+                    context="{}" 
+                    invisible="state in ('cancel', 'draft', 'confirmed', 'to_close', 'process')" />
+                <button name="action_send_to_process_two" 
+                    type="object" string="Proceso 2" 
+                    class="oe_highlight" 
+                    context="{}" 
+                    invisible="state in ('cancel', 'draft', 'confirmed', 'to_close', 'process')" />
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="lote" force_save="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mrp_custom</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="mrp.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='process_operations_setting_container']" position="inside">
+                <setting id="mrp_localtion_dest_field" help="Seleccione la Ubicación de Destino para la merma.">
+                    <field name="mrp_localtion_dest_id"/>
+                </setting>   
+                <setting id="mrp_localtion_dest_prod_finished_id" help="Seleccione la Ubicación de Destino para el subproducto terminado.">
+                    <field name="mrp_localtion_dest_prod_finished_id"/>
+                </setting> 
             </xpath>
         </field>
     </record>

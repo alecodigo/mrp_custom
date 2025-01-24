@@ -1,0 +1,47 @@
+<odoo>
+    <record id="manufacturing_processes_view_form" model="ir.ui.view">
+        <field name="name">manufacturing.processes.form</field>
+        <field name="model">manufacturing.processes</field>
+        <field name="arch" type="xml">
+            <form string="Manufacturing Processes">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group>
+                            <field name="process"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="manufacturing_processes_view_tree" model="ir.ui.view">
+        <field name="name">manufacturing.processes.tree</field>
+        <field name="model">manufacturing.processes</field>
+        <field name="arch" type="xml">
+            <tree string="Manufacturing Processes">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="process"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="manufacturing_processes_action" model="ir.actions.act_window">
+        <field name="name">Manufacturing Processes</field>
+        <field name="res_model">manufacturing.processes</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem 
+        id="manufacturing_processes_menu"
+        name="Procesos de Manufactura" 
+        parent="mrp.menu_mrp_configuration" 
+        action="manufacturing_processes_action" 
+        sequence="10" />
+
+</odoo>

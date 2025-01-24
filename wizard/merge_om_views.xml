@@ -1,0 +1,59 @@
+<odoo>
+    <record id="view_merge_om_form" model="ir.ui.view">
+        <field name="name">merge.om.form</field>
+        <field name="model">merge.om</field>
+        <field name="arch" type="xml">
+            <form string="Merge Work Centers">
+                <sheet>
+                    <group>
+                        <field name="workcenter_ids" widget="one2many_list" nolabel="1" colspan="2">
+                            <tree editable="bottom">
+                                <field name="operation_num_id" placeholder="Ingrese el número de lote"/>
+                                <field name="operation"/>
+                                <field name="demand_forecast"/>
+                                <field name="order_qty"/>
+                                <field name="workcenter_id"/>
+                                <field name="capacity"/>
+                                <field name="select" column_invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <footer>
+                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Step2 -->
+    <record id="view_merge_om_step2_form" model="ir.ui.view">
+        <field name="name">merge.om.step2.form</field>
+        <field name="model">merge.om</field>
+        <field name="arch" type="xml">
+            <form string="Step 2: Confirm">
+                <sheet>
+                    <div class="oe_title">
+                        <p><strong>Al fusionar las órdenes de manufactura, ¿cuál número de operation se conservará?</strong></p>
+                    </div>
+                    <group colspan="2">
+                        <field name="workcenter_ids" widget="one2many_list" nolabel="1" colspan="2">
+                            <tree editable="bottom">
+                                <field name="operation_num_id"/>
+                                <field name="operation"/>
+                                <field name="demand_forecast" column_invisible="1"/>
+                                <field name="workcenter_id" column_invisible="1"/>
+                                <field name="capacity" column_invisible="1"/>
+                                <field name="select"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <footer>
+                        <button string="Confirmar" type="object" name="merge_mro" class="btn-success"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

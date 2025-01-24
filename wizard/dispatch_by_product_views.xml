@@ -10,12 +10,14 @@
                     <field name="quantity"/>
                     <field name="location_id"/>
                     <field name="location_dest_id"/>
+                    <field name="date_done"/>
+                    <field name="mrp_id" invisible="1"/>
                 </group>
                 <footer>
-                    <button string="Transfer" type="object" name="action_transfer_by_product" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    <button string="Transferir" type="object" name="action_transfer_by_product" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
-</odoo>
+</odoo> 
